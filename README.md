@@ -10,6 +10,10 @@
 
 程序结构说明，请见 [程序结构](https://learnku.com/courses/go-api/1.17/program-structure/11772)。
 
+## 数据库连接
+
+支持 MySQL、PostgreSQL 和 SQLite。通过 `.env` 中的 `DB_CONNECTION` 选择数据库；连接地址、端口、库名、用户名和密码分别由 `DB_HOST`、`DB_PORT`、`DB_DATABASE`、`DB_USERNAME` 和 `DB_PASSWORD` 配置。PostgreSQL 使用 `DB_CONNECTION=postgres` 并将 `DB_PORT` 设为 `5432`，可用 `DB_SSLMODE` 和 `DB_TIMEZONE` 设置 TLS 模式及时区。连接池由 `DB_MAX_IDLE_CONNECTIONS`、`DB_MAX_OPEN_CONNECTIONS` 和 `DB_MAX_LIFE_SECONDS` 控制。
+
 
 ## RESTful API 最佳实践
 

@@ -6,9 +6,12 @@ import (
 	"gohub/pkg/config"
 	"gohub/pkg/database"
 	"gohub/pkg/logger"
+	"net"
+	"net/url"
 	"time"
 
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -35,6 +38,19 @@ func SetupDB() {
 		// 初始化 sqlite
 		database := config.Get("database.sqlite.database")
 		dbConfig = sqlite.Open(database)
+	case "postgres":
+		// 使用 URL 编码，确保密码等包含特殊字符时仍能正确解析。
+		postgresURL := &url.URL{
+			Scheme: "postgres",
+			User:   url.UserPassword(config.Get("database.postgres.username"), config.Get("database.postgres.password")),
+			Host:   net.JoinHostPort(config.Get("database.postgres.host"), config.Get("database.postgres.port")),
+			Path:   "/" + config.Get("database.postgres.database"),
+		}
+		query := url.Values{}
+		query.Set("sslmode", config.Get("database.postgres.sslmode"))
+		query.Set("TimeZone", config.Get("database.postgres.timezone"))
+		postgresURL.RawQuery = query.Encode()
+		dbConfig = postgres.Open(postgresURL.String())
 	default:
 		panic(errors.New("database connection not supported"))
 	}
@@ -43,9 +59,9 @@ func SetupDB() {
 	database.Connect(dbConfig, logger.NewGormLogger())
 
 	// 设置最大连接数
-	database.SQLDB.SetMaxOpenConns(config.GetInt("database.mysql.max_open_connections"))
+	database.SQLDB.SetMaxOpenConns(config.GetInt("database.max_open_connections"))
 	// 设置最大空闲连接数
-	database.SQLDB.SetMaxIdleConns(config.GetInt("database.mysql.max_idle_connections"))
+	database.SQLDB.SetMaxIdleConns(config.GetInt("database.max_idle_connections"))
 	// 设置每个链接的过期时间
-	database.SQLDB.SetConnMaxLifetime(time.Duration(config.GetInt("database.mysql.max_life_seconds")) * time.Second)
+	database.SQLDB.SetConnMaxLifetime(time.Duration(config.GetInt("database.max_life_seconds")) * time.Second)
 }

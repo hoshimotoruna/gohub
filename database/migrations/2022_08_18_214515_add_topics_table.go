@@ -21,7 +21,7 @@ func init() {
 		models.BaseModel
 
 		Title      string `gorm:"type:varchar(255);not null;index"`
-		Body       string `gorm:"type:longtext;not null"`
+		Body       string `gorm:"type:text;not null"`
 		UserID     string `gorm:"type:bigint;not null;index"`
 		CategoryID string `gorm:"type:bigint;not null;index"`
 
